@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"ls/internal/app/plantform_tool/clients"
+	"ls/internal/pkg/common"
 )
 type Scan struct {
-
+	common.BaseHandler
 }
 func (h Scan)ScanStart(c *gin.Context){
 	err:=clients.RedisClient.Set(c,"scan_status","on",0)

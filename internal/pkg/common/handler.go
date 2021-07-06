@@ -18,7 +18,6 @@ func (BaseHandler) BindParams(c *gin.Context, d interface{}) error {
 		// Invalid params
 		return err
 	}
-
 	// Translate error message
 	err := Validate.Struct(d)
 	if err != nil {

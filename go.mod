@@ -3,9 +3,10 @@ module ls
 go 1.16
 
 require (
-	github.com/antage/eventsource v0.0.0-20190412115600-84b661236871 // indirect
+	github.com/antage/eventsource v0.0.0-20190412115600-84b661236871
 	github.com/gin-gonic/gin v1.7.2
-	github.com/go-playground/validator/v10 v10.6.1 // indirect
+	github.com/go-playground/universal-translator v0.17.0
+	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect

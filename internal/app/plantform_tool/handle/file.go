@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"fmt"
 	"github.com/antage/eventsource"
 	"github.com/gin-gonic/gin"
 	form2 "ls/internal/app/plantform_tool/form"
@@ -14,13 +13,17 @@ type File struct {
 }
 //上传
 func (h *File) Upload(c *gin.Context){
+	//接收参数
 	var form form2.UploadFileForm
 	if err := h.BindParams(c, &form); err != nil {
-		fmt.Println(err)
-		//h.HandleError(c, err)
+		h.HandleError(c, err)
 		return
 	}
-	//接收参数和返回参数
+	// 判断本地是否存在该文件
+	// 存在 ：判断版本是否为最新
+	// 不存在｜不是最新版本则
+	// 并保存到redis
+	//创建一个sse链接
 	es := eventsource.New(
 		&eventsource.Settings{
 			Timeout: 5 * time.Second,
@@ -29,7 +32,8 @@ func (h *File) Upload(c *gin.Context){
 			IdleTimeout: 30 * time.Minute,
 		}, nil)
 	es.SendRetryMessage(3 * time.Second)
-	defer es.Close()
+	//defer es.Close()
+
 }
 //下载
 func (h *File) Download(c *gin.Context){
