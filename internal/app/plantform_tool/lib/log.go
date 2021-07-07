@@ -26,7 +26,7 @@ func InitLog(){
 		},//输出的时间格式
 		EncodeDuration: func(d time.Duration, enc zapcore.PrimitiveArrayEncoder) {
 			enc.AppendInt64(int64(d) / 1000000)
-		},//
+		},//输出时间戳格式
 	}
 	//自定义日志级别：自定义Info级别
 	infoLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
@@ -37,8 +37,8 @@ func InitLog(){
 	warnLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.WarnLevel && lvl >= logLevel
 	})
-	infoWriter := getWriter(logPath)
-	warnWriter := getWriter(errPath)
+	infoWriter := getWriter("/info")
+	warnWriter := getWriter("/err")
 	// 实现多个输出
 	core := zapcore.NewTee(
 		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(infoWriter), infoLevel), //将info及以下写入logPath，NewConsoleEncoder 是非结构化输出

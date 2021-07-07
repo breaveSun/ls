@@ -1,8 +1,8 @@
 package clients
 
-import (
-	"github.com/go-redis/redis/v8"
-)
+import "github.com/gomodule/redigo/redis"
+
 var (
-	RedisClient *redis.Client
+	//RedisClient *redis.Client
+	RedisPool *redis.Pool
 )
