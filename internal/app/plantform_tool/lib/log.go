@@ -11,8 +11,7 @@ import (
 
 //只能输出结构化日志，但是性能要高于 SugaredLogger
 var logger *zap.Logger
-//可以输出 结构化日志、非结构化日志。性能茶语 zap.Logger，具体可见上面的的单元测试
-var sugarLogger *zap.SugaredLogger
+
 func InitLog(){
 	config := zapcore.EncoderConfig{
 		MessageKey:   "msg",  //结构化（json）输出：msg的key
@@ -29,24 +28,31 @@ func InitLog(){
 		},//输出时间戳格式
 	}
 	//自定义日志级别：自定义Info级别
+	debugLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.DebugLevel
+	})
+
+	//自定义日志级别：自定义Info级别
 	infoLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl < zapcore.WarnLevel && lvl >= logLevel
+		return lvl >= zapcore.InfoLevel && lvl < zapcore.ErrorLevel
 	})
 
 	//自定义日志级别：自定义Warn级别
-	warnLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zapcore.WarnLevel && lvl >= logLevel
+	errLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.ErrorLevel
 	})
 	infoWriter := getWriter("/info")
 	warnWriter := getWriter("/err")
 	// 实现多个输出
 	core := zapcore.NewTee(
-		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(infoWriter), infoLevel), //将info及以下写入logPath，NewConsoleEncoder 是非结构化输出
-		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(warnWriter), warnLevel),//warn及以上写入errPath
-		zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), logLevel),//同时将日志输出到控制台，NewJSONEncoder 是结构化输出
+		//将info及以下写入logPath，NewConsoleEncoder 是非结构化输出
+		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(infoWriter), infoLevel),
+		//warn及以上写入errPath
+		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(warnWriter), errLevel),
+		//同时将日志输出到控制台，NewJSONEncoder 是结构化输出
+		zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), debugLevel),
 	)
-	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.WarnLevel))
-	sugarLogger = logger.Sugar()
+	logger = zap.New(core, zap.AddCaller())
 }
 
 func getWriter(filename string) io.Writer {
