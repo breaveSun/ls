@@ -1,8 +1,12 @@
 package plantform_tool
 
-import "ls/internal/app/plantform_tool/form"
+import (
+	"github.com/spf13/viper"
+	"ls/internal/app/plantform_tool/form"
+)
 
 var (
-	RestartConfig int
+	Config *viper.Viper
+	ServerConfig form.ServerConfig
 	RedisConfig form.RedisConfig
 )

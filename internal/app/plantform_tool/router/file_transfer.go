@@ -14,5 +14,6 @@ func RegisteFileTransferRouter(engine *gin.Engine) {
 
 		//文件下载
 		FileTransfer.POST("download", handle.File{}.Download)
+
 	}
 }

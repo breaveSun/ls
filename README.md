@@ -1,1 +1,1 @@
-"#TEST"
+1、日志的使用方法：lib.Logger.Info("msg",zap.String("key","string"))

@@ -1,5 +1,10 @@
 package form
 
+type ServerConfig struct {
+	Restart int
+	Port int
+}
+
 type RedisConfig struct {
 	Server string
 	Password string

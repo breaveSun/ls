@@ -1,6 +1,8 @@
-package lib
+package logger
 
 import (
+	"fmt"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io"
@@ -10,7 +12,7 @@ import (
 )
 
 //只能输出结构化日志，但是性能要高于 SugaredLogger
-var logger *zap.Logger
+var Logger *zap.Logger
 
 func InitLog(){
 	config := zapcore.EncoderConfig{
@@ -41,8 +43,8 @@ func InitLog(){
 	errLevel := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.ErrorLevel
 	})
-	infoWriter := getWriter("/info")
-	warnWriter := getWriter("/err")
+	infoWriter := getWriter("tmp/info")
+	warnWriter := getWriter("tmp/err")
 	// 实现多个输出
 	core := zapcore.NewTee(
 		//将info及以下写入logPath，NewConsoleEncoder 是非结构化输出
@@ -52,7 +54,7 @@ func InitLog(){
 		//同时将日志输出到控制台，NewJSONEncoder 是结构化输出
 		zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), debugLevel),
 	)
-	logger = zap.New(core, zap.AddCaller())
+	Logger = zap.New(core, zap.AddCaller())
 }
 
 func getWriter(filename string) io.Writer {
@@ -65,6 +67,7 @@ func getWriter(filename string) io.Writer {
 		rotatelogs.WithRotationTime(time.Hour*24), //切割频率 24小时
 	)
 	if err != nil {
+		fmt.Println("日志启动异常")
 		log.Println("日志启动异常")
 		panic(err)
 	}
