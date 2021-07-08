@@ -5,6 +5,7 @@ import (
 	"ls/internal/app/plantform_tool"
 	"ls/internal/app/plantform_tool/clients"
 	"ls/internal/app/plantform_tool/form"
+	"ls/internal/pkg/lib/logger"
 	"time"
 )
 
@@ -32,6 +33,8 @@ func PoolInitRedis(conf form.RedisConfig) {
 			return err
 		},
 	}
+
+	logger.Logger.Info("redis初始化成功")
 }
 //key-value set
 func RedisSetString(key,value interface{}) (string, error) {

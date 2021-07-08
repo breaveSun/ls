@@ -1,0 +1,6 @@
+server_restart : 0
+server_port : 22456
+redis_server : "127.0.0.1:6379"
+redis_password : ""
+max_idle : 5
+max_active : 2

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go.uber.org/zap"
+	"ls/internal/app"
 	"ls/internal/app/plantform_tool"
 	"ls/internal/app/plantform_tool/lib"
 	"ls/internal/app/plantform_tool/router"
@@ -32,18 +33,25 @@ func main(){
 			logger.Logger.Error("服务异常", zap.String("err_info", fmt.Sprintf("%v", err)))
 		}
 	}()
-	logger.Logger.Error("测试日志")
 	//初始化redis服务
 	redis.PoolInitRedis(plantform_tool.RedisConfig)
-	//端口检测
 
 	//初始化路由
 	engine := router.InitRouter()
+
+	//服务初始化
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", plantform_tool.ServerConfig.Port),
 		Handler: engine,
 	}
+	 	//信号量检测
+	go	app.SignGrab()
+	//todo:端口检测
+	//端口监听
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		logger.Logger.Fatal("监听端口失败，检查是否被占用", zap.Int("port", plantform_tool.ServerConfig.Port), zap.Reflect("error", err.Error()))
 	}
+	logger.Logger.Info("服务监听接口成功")
+
+
 }

@@ -44,17 +44,18 @@ func InitLog(){
 		return lvl >= zapcore.ErrorLevel
 	})
 	infoWriter := getWriter("tmp/info")
-	warnWriter := getWriter("tmp/err")
+	errWriter := getWriter("tmp/err")
 	// 实现多个输出
 	core := zapcore.NewTee(
 		//将info及以下写入logPath，NewConsoleEncoder 是非结构化输出
 		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(infoWriter), infoLevel),
-		//warn及以上写入errPath
-		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(warnWriter), errLevel),
+		//warn及以上写入errPath，NewConsoleEncoder 是非结构化输出
+		zapcore.NewCore(zapcore.NewConsoleEncoder(config), zapcore.AddSync(errWriter), errLevel),
 		//同时将日志输出到控制台，NewJSONEncoder 是结构化输出
 		zapcore.NewCore(zapcore.NewJSONEncoder(config), zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)), debugLevel),
 	)
 	Logger = zap.New(core, zap.AddCaller())
+	Logger.Info("日志初始化成功")
 }
 
 func getWriter(filename string) io.Writer {
