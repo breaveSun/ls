@@ -1,1 +1,0 @@
-编译:go build -o .\build\package\main.exe  -ldflags "-H=windowsgui" .\cmd\plantform_tool\main.gogo build -o .\build\package\main.exe -ldflags "-H=windowsgui" .\cmd\plantform_tool\main.go

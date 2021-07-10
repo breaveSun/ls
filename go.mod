@@ -12,12 +12,15 @@ require (
 	github.com/go-playground/validator/v10 v10.6.1
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/gomodule/redigo v1.8.5 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/spf13/viper v1.8.1 // indirect
+	github.com/tidwall/gjson v1.8.1 // indirect
+	github.com/tidwall/sjson v1.1.7 // indirect
 	github.com/ugorji/go v1.2.6 // indirect
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
 	go.uber.org/zap v1.18.1 // indirect

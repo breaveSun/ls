@@ -11,10 +11,7 @@ type CodeData struct {
 }
 // Success 成功
 func (BaseHandler) Success(c *gin.Context, data interface{}) {
-	c.JSON(http.StatusOK, CodeData{
-		Code: 0,
-		Data: data,
-	})
+	c.JSON(http.StatusOK,data)
 }
 // ErrorCode 成功(自定义code)
 func (BaseHandler) ErrorCode(c *gin.Context, code int, message string) {

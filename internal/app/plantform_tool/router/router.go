@@ -9,6 +9,8 @@ func InitRouter() *gin.Engine {
 	engine := gin.Default()
 	RegisterControlSoftwareRouter(engine)
 	RegisteFileTransferRouter(engine)
+	RegisteWindowsServerRouter(engine)
+	RegisteCommandRouter(engine)
 
 	logger.Logger.Info("路由初始话成功")
 	return engine

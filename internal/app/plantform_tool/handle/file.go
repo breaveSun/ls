@@ -4,22 +4,30 @@ import (
 	"fmt"
 	"github.com/antage/eventsource"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"io/ioutil"
+	"ls/internal/app/plantform_tool/form"
+	"ls/internal/pkg/common"
+	"ls/internal/pkg/lib/logger"
 	"ls/internal/pkg/lib/redis"
+
+	upZip "ls/internal/pkg/lib/zip"
 	"net/http"
+	"os"
 	"time"
 )
 
 type File struct {
-	//common.BaseHandler
+	common.BaseHandler
 }
-//上传
+/*上传*/
 func (h File) Upload(c *gin.Context){
 	//接收参数
-	/*var form form2.UploadFileForm
+	var form form.UploadFileForm
 	if err := h.BindParams(c, &form); err != nil {
 		h.HandleError(c, err)
 		return
-	}*/
+	}
 
 	// 判断本地是否存在该文件
 	// 存在 ：判断版本是否为最新 且最新，todo:判断是否解压 没解压解压，返回下载完成
@@ -78,35 +86,104 @@ func rollback(es eventsource.EventSource,filemap map[string]int) {
 }
 //下载
 func (h File) Download(c *gin.Context){
-	//待定
-	/*用于测试sse
-	es := eventsource.New(
-		&eventsource.Settings{
-			Timeout:        2 * time.Second,
-			CloseOnTimeout: true,
-			IdleTimeout:    2 * time.Second,
-			Gzip:           true,
-		},
-		func(req *http.Request) [][]byte {
-			return [][]byte{
-				[]byte("X-Accel-Buffering: no"),
-				[]byte("Access-Control-Allow-Origin: *"),
-			}
-		},
-	)
+	//获取请求参数
+	/*params,err := h.GetParams(c)*/
 
-	es.ServeHTTP(c.Writer, c.Request)
-
-	go func() {
-		var id int
-		for {
-			id++
-			time.Sleep(1 * time.Second)
-			es.SendEventMessage("blabla", "message", strconv.Itoa(id))
-			if es.ConsumersCount() == 0{
-				fmt.Println("客户端停止接收")
-				break
-			}
-		}
-	}()*/
 }
+
+/*四、查询本地文件*/
+func (h File) CheckExists(c *gin.Context){
+	//参数解析
+	var request form.CheckExistsForm
+	if err := h.BindParams(c, &request); err != nil {
+		h.HandleError(c, err)
+		return
+	}
+	path := request.Path
+	var re = form.CheckExistsRBForm{
+		Path:path,
+		Exists:false,
+	}
+	if _, err := os.Stat(path); err != nil{
+		re.Exists = true
+	}
+	h.Success(c,re)
+}
+/*十、读取文件*/
+func (h File) ReadFromFile(c *gin.Context) {
+	//参数解析
+	var request form.ReadFromFileForm
+	if err := h.BindParams(c, &request); err != nil {
+		h.HandleError(c, err)
+		return
+	}
+	var re = form.ReadFromFileRBForm{
+		ReadFromFileForm:request,
+	}
+	f, err := os.Open(request.Path)
+	if err != nil {
+		logger.Logger.Error(fmt.Sprintf("ReadFromFile open file err :%s",request.Path),
+			zap.String("errMsg",err.Error()))
+		h.Success(c,re)
+		return
+	}
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			logger.Logger.Error(fmt.Sprintf("ReadFromFile close file err :%s",request.Path),
+				zap.String("errMsg",err.Error()))
+		}
+	}(f)
+
+	data,err :=ioutil.ReadAll(f)
+	if err != nil {
+		logger.Logger.Error(fmt.Sprintf("ReadFromFile read file err :%s",request.Path),
+			zap.String("errMsg",err.Error()))
+		h.Success(c,re)
+		return
+	}
+	re.Data = string(data)
+	h.Success(c,re)
+	return
+}
+
+/*十一、压缩*/
+func (h File) Compress(c *gin.Context) {
+	//参数解析
+	var request form.CompressForm
+	if err := h.BindParams(c, &request); err != nil {
+		h.HandleError(c, err)
+		return
+	}
+	var re = form.CompressRBForm{Ret: true}
+	err := upZip.Compress(request.Source,request.Dest)
+	if err != nil{
+		re.Ret = false
+		logger.Logger.Error("Compress err",zap.String("errMsg",err.Error()))
+	}
+	h.Success(c,re)
+	return
+}
+
+/*十二、解压*/
+func (h File) Decompress(c *gin.Context) {
+	//参数解析
+	var request form.DecompressForm
+	if err := h.BindParams(c, &request); err != nil {
+		h.HandleError(c, err)
+		return
+	}
+	var re = form.DecompressRBForm{Ret: true}
+	err := upZip.Decompress(request.Source,request.Dest)
+	if err != nil{
+		re.Ret = false
+		logger.Logger.Error("Decompress err",zap.String("errMsg",err.Error()))
+	}
+	h.Success(c,re)
+	return
+	//目标文件夹不存在则创建
+
+	h.Success(c,re)
+	return
+}
+

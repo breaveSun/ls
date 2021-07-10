@@ -1,8 +1,10 @@
 package lib
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"ls/internal/app/plantform_tool"
+	"ls/internal/pkg/common"
 )
 
 func InitConf(){
@@ -19,4 +21,5 @@ func InitConf(){
 	plantform_tool.RedisConfig.MaxIdle = v.GetInt("max_idle")
 	plantform_tool.RedisConfig.MaxActive = v.GetInt("max_active")
 	plantform_tool.Config = v
+	common.Validate = validator.New()
 }

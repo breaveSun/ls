@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"go.uber.org/zap"
-	"ls/internal/app"
 	"ls/internal/app/plantform_tool"
 	"ls/internal/app/plantform_tool/lib"
 	"ls/internal/app/plantform_tool/router"
@@ -44,8 +43,8 @@ func main(){
 		Addr:    fmt.Sprintf(":%d", plantform_tool.ServerConfig.Port),
 		Handler: engine,
 	}
-	 	//信号量检测
-	go	app.SignGrab()
+	/*//信号量检测 只能检测到停止
+	go	app.SignGrab()*/
 	//todo:端口检测
 	//端口监听
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

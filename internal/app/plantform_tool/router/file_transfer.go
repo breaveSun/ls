@@ -6,14 +6,20 @@ import (
 )
 
 func RegisteFileTransferRouter(engine *gin.Engine) {
-	//扫描软件控制
-	FileTransfer := engine.Group("fileTransfer")
-	{
-		//文件上传
-		FileTransfer.POST("upload", handle.File{}.Upload)
+/*	FileTransfer := engine.Group("fileTransfer")
+	{*/
+/*		//文件上传
+	engine.POST("upload", handle.File{}.Upload)
 
 		//文件下载
-		FileTransfer.POST("download", handle.File{}.Download)
+	engine.POST("download", handle.File{}.Download)*/
+	/*四、查询本地文件*/
+	engine.POST("CheckExists", handle.File{}.CheckExists)
+	/*十、读取文件*/
+	engine.POST("ReadFromFile", handle.File{}.ReadFromFile)
+	/*十一、压缩*/
+	engine.POST("Compress", handle.File{}.Compress)
+	/*十二、解压*/
+	engine.POST("Decompress", handle.File{}.Decompress)
 
-	}
 }
