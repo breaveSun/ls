@@ -1,13 +1,17 @@
 package common
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"ls/internal/pkg/lib/logger"
+	"net/http"
 	"strings"
+	"time"
 )
 
 type BaseHandler struct{}
@@ -33,11 +37,10 @@ func (BaseHandler) BindParams(c *gin.Context, d interface{}) error {
 	return nil
 }
 
-func (BaseHandler) GetParams(c *gin.Context)(gjson.Result,error){
-	var defReturn gjson.Result
+func (BaseHandler) GetParams(c *gin.Context)(string,error){
+	var defReturn string
 	bodyByte, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		fmt.Println(err)
 		logger.Logger.Error("接口解析参数失败",zap.String("errMsg",err.Error()))
 		return defReturn,err
 	}
@@ -47,8 +50,8 @@ func (BaseHandler) GetParams(c *gin.Context)(gjson.Result,error){
 		return defReturn,err
 	}
 
-	result := gjson.Parse(body)
-	return result,nil
+	//result := gjson.Parse(body)
+	return body,nil
 }
 //获取文件路径
 func (BaseHandler) GetDirPath(path string) string {
@@ -69,4 +72,16 @@ func subString(str string, start, end int) string {
 	}
 
 	return str[start:end]
+}
+//发送post请求
+func CallServer(url string,param interface{})(string,error){
+	client := &http.Client{Timeout: 5 * time.Second}
+	requestByte,_:=jsoniter.Marshal(param)
+	resp, err := client.Post(url, "application/json", bytes.NewBuffer(requestByte))
+	defer resp.Body.Close()
+	if err != nil {
+		return "",err
+	}
+	result, _ := ioutil.ReadAll(resp.Body)
+	return string(result),nil
 }

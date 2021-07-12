@@ -6,13 +6,10 @@ import (
 )
 
 func RegisteFileTransferRouter(engine *gin.Engine) {
-/*	FileTransfer := engine.Group("fileTransfer")
-	{*/
-/*		//文件上传
-	engine.POST("upload", handle.File{}.Upload)
-
-		//文件下载
-	engine.POST("download", handle.File{}.Download)*/
+	/*一、上传*/
+	engine.POST("Upload", handle.File{}.Upload)
+	/*二、下载*/
+	engine.POST("Download", handle.File{}.Download)
 	/*四、查询本地文件*/
 	engine.POST("CheckExists", handle.File{}.CheckExists)
 	/*十、读取文件*/

@@ -1,7 +1,36 @@
 package form
 
 type UploadFileForm struct {
-	Id uint32 `json:"id"`
+	//传输类型
+	TransType string `json:"TransType"`
+	//云端路径
+	OssPath string `json:"OssPath"`
+	//本地路径
+	LocalPath string `json:"LocalPath"`
+	//存储空间
+	Bucket string `json:"Bucket"`
+	//节点
+	EndPoint string `json:"EndPoint"`
+	//最大重试次数
+	MaxTry string `json:"MaxTry"`
+	//是否需要压缩包操作  0：无  1：需要压缩 2：需要解压
+	NeedZip int `json:"NeedZip"`
+	//NeedZip非0时，需要用到该字段
+	ZipTarget string `json:"ZipTarget"`
+	//私有数据
+	Private string `json:"Private"`
+	//任务类型
+	TaskType string `json:"TaskType"`
+	//属于某订单
+	Order string `json:"Order"`
+	//用户信息
+	User string `json:"User"`
+	//企业信息
+	Company string `json:"Company"`
+	//回调地址(回调地址合并后删除)
+	CallBackUrl string `json:"CallBackUrl"`
+	//回调数据
+	CallBackData string `json:"CallBackData"`
 }
 /*四、查询本地文件*/
 type CheckExistsForm struct {
@@ -36,4 +65,15 @@ type DecompressForm struct {
 }
 type DecompressRBForm struct {
 	Ret bool `json:"Ret"`
+}
+
+/*文件上传&下载回调*/
+type FileTransferRequestForm struct {
+	FileSize string `json:"FileSize"`//文件大小
+	CallBackData string `json:"CallBackData"` //回调结果
+}
+/*服务器返回结果*/
+type ServerResponseForm struct {
+	Code int `json:"code"`
+	Msg string `json:"msg"`
 }

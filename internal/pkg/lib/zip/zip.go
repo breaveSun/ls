@@ -36,10 +36,12 @@ func Compress(source, dest string) error {
 
 	// 下面来将文件写入 zw ，因为有可能会有很多个目录及文件，所以递归处理
 	return filepath.Walk(source, func(path string, fi os.FileInfo, errBack error) (err error) {
-
-
 		if errBack != nil {
 			return errBack
+		}
+
+		if fi.IsDir(){
+			return
 		}
 
 		// 通过文件信息，创建 zip 的文件信息
@@ -51,14 +53,7 @@ func Compress(source, dest string) error {
 		// 替换文件信息中的文件名
 		fh.Name = strings.TrimPrefix(filepath.ToSlash(path), filepath.ToSlash(source))
 
-		// 这步开始没有加，会发现解压的时候说它不是个目录
-		/*
-		   if fi.IsDir() {
-		       fh.Name += "/"
-		   }
-		*/
 		fh.Name = strings.TrimPrefix(fh.Name, "/")
-		//uplog.Debug(">>local :", path, "in zip :", fh.Name)
 
 		// 写入文件信息，并返回一个 Write 结构
 		w, err := zw.CreateHeader(fh)
@@ -84,13 +79,16 @@ func Compress(source, dest string) error {
 		if err != nil {
 			return
 		}
+
 		// 输出压缩的内容
 		fmt.Printf("成功压缩文件： %s, 共写入了 %d 个字符的数据\n", path, n)
 
 		return nil
 	})
 }
-
+//解压缩文件
+//files 文件数组，可以是不同dir下的文件或者文件夹
+//dest 压缩文件存放地址
 func Decompress(source, dest string) error {
 	if _, err := os.Stat(source); err != nil {
 		if os.IsNotExist(err) {
@@ -115,51 +113,45 @@ func Decompress(source, dest string) error {
 	for _, file := range reader.File {
 		fileName := source+"\\"+file.Name
 		if file.FileInfo().IsDir() {
+			wg.Done()
 			err := os.MkdirAll(fileName, 0755)
 			if err != nil {
+				fileErr<-err
 				logger.Logger.Error("Decompress (IsDir) Close zip err",zap.String("errMsg",err.Error()))
 				return err
 			}
+			fileErr<-nil
 		} else {
 			p := common.BaseHandler{}.GetDirPath(fileName)
 			err = os.MkdirAll(p, 0755)
 			if err != nil {
+				wg.Done()
 				logger.Logger.Error("Decompress Close zip err",zap.String("errMsg",err.Error()))
 				return err
 			}
+			go OneFileCopy(&wg,file,fileName,fileErr)
 		}
-		go OneFileCopy(wg,file,fileName,fileErr)
-		
 	}
 	wg.Wait()
-	for  {
+	for i:=0;i<wgNum;i++ {
 		o,ok := <-fileErr
-		if !ok {
-			return nil
-		}
-		if o !=nil{
+		if !ok || o!=nil{
 			return o
 		}
 	}
+	return nil
 }
-func OneFileCopy(wg sync.WaitGroup,file *zip.File,fileName string,fileErr chan error) {
-	defer wg.Done()
+func OneFileCopy(wg *sync.WaitGroup,file *zip.File,fileName string,fileErr chan error) {
+	defer func(wg *sync.WaitGroup) {
+		wg.Done()
+	}(wg)
 	rc, err := file.Open()
 	if err != nil {
 		logger.Logger.Error("Decompress file.Open err", zap.String("errMsg", err.Error()))
 		fileErr<-err
 		return
 	}
-	defer func(rc io.ReadCloser) {
-		err = rc.Close()
-		if err != nil {
-			logger.Logger.Error("Decompress rc.Close err", zap.String("errMsg", err.Error()))
-			fileErr<-err
-			return
-		}
-	}(rc)
-	fmt.Println(fileName)
-	fmt.Println(len(fileErr))
+	defer rc.Close()
 	w, err := os.Create(fileName)
 	if err != nil {
 		logger.Logger.Error(fmt.Sprintf("Decompress Create %s err",fileName), zap.String("errMsg", err.Error()))
@@ -167,7 +159,6 @@ func OneFileCopy(wg sync.WaitGroup,file *zip.File,fileName string,fileErr chan e
 		return
 	}
 	defer w.Close()
-
 	_, err = io.Copy(w, rc)
 	if err != nil {
 		logger.Logger.Error(fmt.Sprintf("Decompress copy %s err",fileName), zap.String("errMsg", err.Error()))

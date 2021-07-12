@@ -1,5 +1,6 @@
 server_restart : 0
 server_port : 22456
+file_transfer_listen_interval : 1000
 redis_server : "127.0.0.1:6379"
 redis_password : ""
 max_idle : 5

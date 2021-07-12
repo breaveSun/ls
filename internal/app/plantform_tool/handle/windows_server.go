@@ -1,11 +1,13 @@
 package handle
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"golang.org/x/sys/windows/registry"
 	"ls/internal/app/plantform_tool/form"
 	"ls/internal/pkg/common"
+	upcommand "ls/internal/pkg/lib/command"
 	"ls/internal/pkg/lib/logger"
 )
 
@@ -45,4 +47,39 @@ func (h WindowsServer) ReadRegistry(c *gin.Context) {
 	}
 
 	h.Success(c,registInfoList)
+}
+
+
+/*七-1、App 运行状态检测（一次性）*/
+func (h WindowsServer) CheckRunning(c *gin.Context) {
+	var request form.CheckRunningFrom
+	if err := h.BindParams(c, &request); err != nil {
+		h.HandleError(c, err)
+		return
+	}
+	if request.AppName !=""{
+		var re  = form.CheckRunningAppNameRBFrom{
+			AppName: request.AppName,
+			Running: upcommand.Test(request.AppName),
+		}
+		h.Success(c,re)
+		return
+	} else if request.MemName != ""{
+		var re  = form.CheckRunningAppNameRBFrom{
+			AppName: request.AppName,
+			Running: upcommand.Test(request.AppName),
+		}
+		h.Success(c,re)
+		return
+	}
+	h.HandleError(c,errors.New("param err"))
+	return
+}
+/*七-2、App 运行状态检测（持续检测）*/
+func (h WindowsServer) RunningStatus(c *gin.Context) {
+	var request form.RunningStatusFrom
+	if err := h.BindParams(c, &request); err != nil {
+		h.HandleError(c, err)
+		return
+	}
 }

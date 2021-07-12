@@ -22,4 +22,5 @@ func InitConf(){
 	plantform_tool.RedisConfig.MaxActive = v.GetInt("max_active")
 	plantform_tool.Config = v
 	common.Validate = validator.New()
+	plantform_tool.ServerConfig.FileTransferListenInterval = v.GetInt("file_transfer_listen_interval")
 }
