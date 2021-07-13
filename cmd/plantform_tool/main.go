@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"ls/internal/app/plantform_tool"
-	"ls/internal/app/plantform_tool/handle"
 	"ls/internal/app/plantform_tool/lib"
 	"ls/internal/app/plantform_tool/router"
 	"ls/internal/pkg/lib/logger"
@@ -40,16 +39,16 @@ func main(){
 	engine := router.InitRouter()
 
 	//初始化文件上传下载任务监控
-	handle.StartFileTransferProgressListen()
+	lib.StartFileTransferProgressListen()
 
 	//服务初始化
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", plantform_tool.ServerConfig.Port),
 		Handler: engine,
 	}
-	/*//信号量检测 只能检测到停止
-	go	app.SignGrab()*/
+
 	//todo:端口检测
+	//查看端口使用情况
 	//端口监听
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		logger.Logger.Fatal("监听端口失败，检查是否被占用", zap.Int("port", plantform_tool.ServerConfig.Port), zap.Reflect("error", err.Error()))

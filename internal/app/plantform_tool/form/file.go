@@ -32,7 +32,8 @@ type UploadFileForm struct {
 	//回调数据
 	CallBackData string `json:"CallBackData"`
 }
-/*四、查询本地文件*/
+
+// CheckExistsForm /*四、查询本地文件*/
 type CheckExistsForm struct {
 	Path string `json:"Path"`
 }
@@ -41,7 +42,8 @@ type CheckExistsRBForm struct {
 	Path string `json:"Path"`
 	Exists bool `json:"Exists"`
 }
-/*十、读取文件*/
+
+// ReadFromFileForm /*十、读取文件*/
 type ReadFromFileForm struct {
 	Path string `json:"Path"`
 }
@@ -50,7 +52,8 @@ type ReadFromFileRBForm struct {
 	ReadFromFileForm
 	Data string `json:"Data"`
 }
-/*十一、压缩*/
+
+// CompressForm /*十一、压缩*/
 type CompressForm struct {
 	Source string `json:"Source"`
 	Dest string `json:"Dest"`
@@ -58,7 +61,8 @@ type CompressForm struct {
 type CompressRBForm struct {
 	Ret bool `json:"Ret"`
 }
-/*十二、解压*/
+
+// DecompressForm /*十二、解压*/
 type DecompressForm struct {
 	Source string `json:"Source"`
 	Dest string `json:"Dest"`
@@ -67,12 +71,13 @@ type DecompressRBForm struct {
 	Ret bool `json:"Ret"`
 }
 
-/*文件上传&下载回调*/
+// FileTransferRequestForm /*文件上传&下载回调*/
 type FileTransferRequestForm struct {
 	FileSize string `json:"FileSize"`//文件大小
 	CallBackData string `json:"CallBackData"` //回调结果
 }
-/*服务器返回结果*/
+
+// ServerResponseForm /*服务器返回结果*/
 type ServerResponseForm struct {
 	Code int `json:"code"`
 	Msg string `json:"msg"`

@@ -2,13 +2,12 @@ package handle
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"golang.org/x/sys/windows/registry"
 	"ls/internal/app/plantform_tool/form"
 	"ls/internal/pkg/common"
 	upcommand "ls/internal/pkg/lib/command"
-	"ls/internal/pkg/lib/logger"
 )
 
 const LocalMachine = "HKEY_LOCAL_MACHINE"
@@ -16,7 +15,8 @@ const CurrentUser = "HKEY_CURRENT_USER"
 type WindowsServer struct {
 	common.BaseHandler
 }
-//五、读取注册表
+
+// ReadRegistry 五、读取注册表
 func (h WindowsServer) ReadRegistry(c *gin.Context) {
 	var request  []form.ReadRegistryFrom
 	if err := h.BindParams(c, &request); err != nil {
@@ -37,20 +37,22 @@ func (h WindowsServer) ReadRegistry(c *gin.Context) {
 		}
 		k, err := registry.OpenKey(rootKey, o.Path, registry.ALL_ACCESS)
 		if err != nil {
-			logger.Logger.Error("get "+o.Root+" err",zap.String("errMsg",err.Error()))
+			h.HandleError(c,errors.New(fmt.Sprintf("get %s err : %s",o.Root,err.Error())))
+			return
 		}
 		re.Value,_,err=k.GetStringValue(o.Key)
 		if err != nil{
-			logger.Logger.Error("get " + o.Root + "'s " + o.Key + " error ",zap.String("errMsg",err.Error()))
+			h.HandleError(c,errors.New(fmt.Sprintf("get %s's %s err : %s",o.Root,o.Key,err.Error())))
+			return
 		}
 		registInfoList = append(registInfoList,re)
 	}
 
 	h.Success(c,registInfoList)
+	return
 }
 
-
-/*七-1、App 运行状态检测（一次性）*/
+// CheckRunning /*七-1、App 运行状态检测（一次性）*/
 func (h WindowsServer) CheckRunning(c *gin.Context) {
 	var request form.CheckRunningFrom
 	if err := h.BindParams(c, &request); err != nil {
@@ -65,6 +67,7 @@ func (h WindowsServer) CheckRunning(c *gin.Context) {
 		h.Success(c,re)
 		return
 	} else if request.MemName != ""{
+		//todo:未处理
 		var re  = form.CheckRunningAppNameRBFrom{
 			AppName: request.AppName,
 			Running: upcommand.Test(request.AppName),
@@ -82,4 +85,5 @@ func (h WindowsServer) RunningStatus(c *gin.Context) {
 		h.HandleError(c, err)
 		return
 	}
+	//todo:未处理
 }

@@ -1,5 +1,6 @@
 package form
-/*六、CMD 执行*/
+
+// ExecCommandFrom /*六、CMD 执行*/
 type ExecCommandFrom struct {
 	Command string `json:"Command"`
 	Args []string `json:"Args"`
@@ -7,7 +8,8 @@ type ExecCommandFrom struct {
 type ExecCommandRBFrom struct {
 	ErrorInfo string `json:"ErrorInfo"`
 }
-/*八、杀进程*/
+
+// KillProcessFrom /*八、杀进程*/
 type KillProcessFrom struct {
 	AppName string `json:"AppName"`
 }

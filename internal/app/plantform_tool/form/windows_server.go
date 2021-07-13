@@ -1,5 +1,6 @@
 package form
-/*五、读取注册表*/
+
+// ReadRegistryFrom /*五、读取注册表*/
 type ReadRegistryFrom struct {
 	Root string `json:"Root" validate:"required"`
 	Path string `json:"Path" validate:"required"`
@@ -11,8 +12,7 @@ type ReadRegistryRBFrom struct {
 	Value string `json:"Value"`
 }
 
-
-/*七-1、App 运行状态检测（一次性）*/
+// CheckRunningFrom /*七-1、App 运行状态检测（一次性）*/
 type CheckRunningFrom struct {
 	AppName string `json:"AppName"`
 	MemName string `json:"MemName"`
@@ -27,7 +27,7 @@ type CheckRunningMemNameRBFrom struct {
 	Running bool `json:"Running"`
 }
 
-/*七-2、App 运行状态检测（持续检测）*/
+// RunningStatusFrom /*七-2、App 运行状态检测（持续检测）*/
 type RunningStatusFrom struct {
 	AppName string `json:"AppName"`
 	MemName string `json:"MemName"`

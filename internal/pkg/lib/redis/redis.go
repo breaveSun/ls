@@ -3,15 +3,14 @@ package redis
 import (
 	"github.com/gomodule/redigo/redis"
 	"ls/internal/app/plantform_tool"
-	"ls/internal/app/plantform_tool/clients"
-	"ls/internal/app/plantform_tool/form"
+	"ls/internal/app/plantform_tool/config"
 	"ls/internal/pkg/lib/logger"
 	"time"
 )
 
 /*链接池初始化*/
-func PoolInitRedis(conf form.RedisConfig) {
-	clients.RedisPool = &redis.Pool{
+func PoolInitRedis(conf config.RedisConfig) {
+	plantform_tool.RedisPool = &redis.Pool{
 		MaxIdle:     conf.MaxIdle,//空闲数
 		IdleTimeout: 240 * time.Second,
 		MaxActive:   conf.MaxActive,//最大数
@@ -38,7 +37,7 @@ func PoolInitRedis(conf form.RedisConfig) {
 }
 /*key-value set*/
 func RedisSetString(key,value interface{}) (string, error) {
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return "", err
 	}
@@ -48,7 +47,7 @@ func RedisSetString(key,value interface{}) (string, error) {
 
 /*key-value get string*/
 func RedisGetString(key interface{}) (string, error) {
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return "", err
 	}
@@ -58,25 +57,34 @@ func RedisGetString(key interface{}) (string, error) {
 }
 /*自增的数字*/
 func INCRInt64(key interface{}) (int64, error){
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return 0, err
 	}
 	defer con.Close()
 	return redis.Int64(con.Do("INCR", key))
 }
-/*list插入数据*/
+/*list插入数据 左进*/
 func LPush(key,value interface{}) (int64, error){
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return 0, err
 	}
 	defer con.Close()
 	return redis.Int64(con.Do("LPUSH", key,value))
 }
+/*list移除数据 右出*/
+func RPop(key interface{}) (int, error){
+	con := plantform_tool.RedisPool.Get()
+	if err := con.Err(); err != nil {
+		return 0, err
+	}
+	defer con.Close()
+	return redis.Int(con.Do("RPOP", key))
+}
 /*list数据长度*/
 func LLen(key interface{}) (int, error){
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return 0, err
 	}
@@ -85,7 +93,7 @@ func LLen(key interface{}) (int, error){
 }
 /*根据索引取值*/
 func LIndex(key,index interface{}) (int, error){
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return 0, err
 	}
@@ -94,7 +102,7 @@ func LIndex(key,index interface{}) (int, error){
 }
 /*根据值移除*/
 func LRem(key,value interface{}) (int64, error){
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return 0, err
 	}
@@ -103,7 +111,7 @@ func LRem(key,value interface{}) (int64, error){
 }
 //执行自定义redis命令
 func RedisExec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
-	con := clients.RedisPool.Get()
+	con := plantform_tool.RedisPool.Get()
 	if err := con.Err(); err != nil {
 		return nil, err
 	}

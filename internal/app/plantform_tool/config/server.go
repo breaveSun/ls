@@ -1,7 +1,9 @@
 package config
-type RedisConfig struct {
-	Host   string `mapstructure:"host"`
-	Port   int    `mapstructure:"port"`
-	Expire int    `mapstructure:"expire"`
-	Path int    `mapstructure:"expire"`
+
+type ServerConfig struct {
+	Restart int
+	Port int
+	//监听文件上传和下载轮询时间间隔
+	FileTransferListenInterval int
 }
+

@@ -14,7 +14,8 @@ import (
 type Command struct {
 	common.BaseHandler
 }
-/*六、CMD 执行*/
+
+// ExecCommand /*六、CMD 执行*/
 func (h Command) ExecCommand(c *gin.Context){
 	var request  form.ExecCommandFrom
 	if err := h.BindParams(c, &request); err != nil {
@@ -29,8 +30,10 @@ func (h Command) ExecCommand(c *gin.Context){
 			logger.Logger.Error("ExecCommand err",zap.String(cmd,re.ErrorInfo))
 	}
 	h.Success(c,re)
+	return
 }
-/*八、杀进程*/
+
+// KillProcess /*八、杀进程*/
 func (h Command) KillProcess(c *gin.Context) {
 	var request form.KillProcessFrom
 	if err := h.BindParams(c, &request); err != nil {
@@ -47,4 +50,5 @@ func (h Command) KillProcess(c *gin.Context) {
 		re.Ret = true
 	}
 	h.Success(c,re)
+	return
 }

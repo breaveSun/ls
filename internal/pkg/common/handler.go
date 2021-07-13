@@ -23,6 +23,7 @@ func (BaseHandler) BindParams(c *gin.Context, d interface{}) error {
 		return err
 	}
 	// Translate error message
+	//todo:暂不开启验证
 	/*err := Validate.Struct(d)
 	if err != nil {
 		if _, ok := err.(validator.ValidationErrors); ok {
@@ -53,7 +54,8 @@ func (BaseHandler) GetParams(c *gin.Context)(string,error){
 	//result := gjson.Parse(body)
 	return body,nil
 }
-//获取文件路径
+
+// GetDirPath 获取文件路径
 func (BaseHandler) GetDirPath(path string) string {
 	e :=strings.LastIndex(path, `\`)
 	return subString(path, 0, e)
@@ -73,7 +75,8 @@ func subString(str string, start, end int) string {
 
 	return str[start:end]
 }
-//发送post请求
+
+// CallServer 发送post请求
 func CallServer(url string,param interface{})(string,error){
 	client := &http.Client{Timeout: 5 * time.Second}
 	requestByte,_:=jsoniter.Marshal(param)
